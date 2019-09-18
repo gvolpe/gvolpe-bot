@@ -9,15 +9,22 @@ import fs2.Stream
 object Main extends IOApp {
 
   def run(args: List[String]): IO[ExitCode] =
-    program.compile.drain.as(ExitCode.Success)
+    getHttpPort
+      .flatMap { port =>
+        new Server[IO].run(port).concurrently(botProgram).compile.drain
+      }
+      .as(ExitCode.Success)
 
-  val program =
+  val botProgram =
     for {
       token <- Stream.eval(getToken)
       implicit0(client: TelegramClient[IO]) <- Stream.resource(TelegramClient.global[IO](token))
       cs <- Stream.eval(CoolStickers.make[IO])
       _ <- Bot.polling[IO].follow(greetings, stickers(cs))
     } yield ()
+
+  def getHttpPort: IO[Int] =
+    IO(sys.env.get("PORT").getOrElse("8080").toInt)
 
   def getToken: IO[String] =
     IO(sys.env.get("TELEGRAM_BOT_TOKEN")).flatMap {

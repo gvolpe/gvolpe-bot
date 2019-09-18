@@ -17,6 +17,8 @@ lazy val root = (project in file("."))
       Libraries.catsEffect,
       Libraries.canoe,
       Libraries.fs2Core,
+      Libraries.http4sDsl,
+      Libraries.http4sServer,
       Libraries.logback % "runtime"
     )
   )
