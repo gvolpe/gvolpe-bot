@@ -35,6 +35,7 @@ private class LiveCoolStickers[F[_]: Sync](
     "CAADAgADxxcAAkKvaQABT0psugtIvgwWBA", // yoda
     "CAADAgADcAMAAs9fiwfBgbTnPr0n8xYE", // walter white
     "CAADBAADVwADyt9oBSRp14BAcTAfFgQ", // shrug (c&h)
+    "CAADAgAD5wcAAnlc4gmqeT-5IQABlNYWBA", // honey bunny
     "CAADBAADdQEAAuJy2QABYH_5z-AqV2cWBA", // mr bean
     "CAADAgADWgcAAlOx9wOIad-ZBUtESxYE", // adventure
     "CAADBAADEwADmDVxAp3k1xTFyNcyFgQ", // bender
