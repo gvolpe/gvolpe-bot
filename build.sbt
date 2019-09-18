@@ -29,3 +29,5 @@ promptTheme := PromptTheme(
 )
 
 addCompilerPlugin("org.scalameta" % "semanticdb-scalac_2.13.0" % "4.2.0")
+
+enablePlugins(JavaAppPackaging)
