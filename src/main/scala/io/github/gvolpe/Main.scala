@@ -1,10 +1,15 @@
 package io.github.gvolpe.bot
 
+import cats.Applicative
 import canoe.api._
+import canoe.models.Chat
+import canoe.models.InputFile.Existing
+import canoe.models.outgoing.StickerContent
 import canoe.syntax._
 import cats.effect._
 import cats.implicits._
 import fs2.Stream
+import scala.concurrent.duration._
 
 object Main extends IOApp {
 
@@ -20,7 +25,7 @@ object Main extends IOApp {
       token <- Stream.eval(getToken)
       implicit0(client: TelegramClient[IO]) <- Stream.resource(TelegramClient.global[IO](token))
       cs <- Stream.eval(CoolStickers.make[IO])
-      _ <- Bot.polling[IO].follow(greetings, stickers(cs))
+      _ <- Bot.polling[IO].follow(greetings, stickers(cs), loveMe)
     } yield ()
 
   def getHttpPort: IO[Int] =
@@ -38,6 +43,21 @@ object Main extends IOApp {
       sticker <- Scenario.eval(cs.pickOne)
       _ <- Scenario.eval(chat.send(sticker))
     } yield ()
+
+  def loveMe[F[_]: Applicative: TelegramClient: Timer]: Scenario[F, Unit] = {
+    def mucho(chat: Chat, count: Int): Scenario[F, Unit] =
+      if (count < 20) {
+        Scenario.eval(chat.send("Mucho!")) >>
+          Scenario.eval(Timer[F].sleep(200.millis)) >>
+          mucho(chat, count + 1)
+      } else {
+        val honeyBunny = StickerContent(Existing("CAADAgAD5wcAAnlc4gmqeT-5IQABlNYWBA"))
+        Scenario.eval(chat.send(honeyBunny)) >>
+          Scenario.done[F]
+      }
+
+    Scenario.start(command("do_you_love_me").chat).flatMap(mucho(_, 0))
+  }
 
   def greetings[F[_]: TelegramClient]: Scenario[F, Unit] =
     for {
